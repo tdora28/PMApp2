@@ -20,8 +20,6 @@ class ProjectInput {
       true
     );
     this.element = importedNode.firstElementChild as HTMLFormElement;
-    this.attach();
-
     this.element.id = 'user-input';
     this.titleInputElement = this.element.querySelector(
       '#title'
@@ -32,7 +30,19 @@ class ProjectInput {
     this.peopleInputElement = this.element.querySelector(
       '#people'
     ) as HTMLInputElement;
+    this.attach();
+    this.configure();
   }
+
+  private submitHandler(event: Event) {
+    event.preventDefault();
+    console.log(this.titleInputElement.value);
+  }
+
+  private configure() {
+    this.element.addEventListener('submit', this.submitHandler.bind(this));
+  }
+
   private attach() {
     this.hostElement.insertAdjacentElement('afterbegin', this.element);
   }
