@@ -28,6 +28,7 @@ function validate(validatableInput) {
         typeof validatableInput.value === 'number') {
         isValid = isValid && validatableInput.value <= validatableInput.max;
     }
+    return isValid;
 }
 function autobind(_, _2, descriptor) {
     const originalMethod = descriptor.value;
@@ -57,9 +58,24 @@ class ProjectInput {
         const enteredTitle = this.titleInputElement.value;
         const enteredDescription = this.descriptionInputElement.value;
         const enteredPeople = this.peopleInputElement.value;
-        if (enteredTitle.trim().length === 0 ||
-            enteredDescription.trim().length === 0 ||
-            enteredPeople.trim().length === 0) {
+        const titleValidatable = {
+            value: enteredTitle,
+            required: true,
+        };
+        const descriptionValidatable = {
+            value: enteredDescription,
+            required: true,
+            minLength: 5,
+        };
+        const peopleValidatable = {
+            value: +enteredPeople,
+            required: true,
+            min: 1,
+            max: 10,
+        };
+        if (!validate(titleValidatable) ||
+            !validate(descriptionValidatable) ||
+            !validate(peopleValidatable)) {
             alert('Invalid input, please try again');
         }
         else {
