@@ -130,7 +130,6 @@ abstract class Component<T extends HTMLElement, U extends HTMLElement> {
 }
 
 class ProjectState extends State<Project> {
-  //private listeners: Listener[] = [];
   private projects: Project[] = [];
   private static instance: ProjectState;
 
@@ -154,8 +153,8 @@ class ProjectState extends State<Project> {
       numofpeople,
       ProjectStatus.Active
     );
-    this.projects = [];
     this.projects.push(newProject);
+    this.updateListeners();
     for (const listenerFn of this.listeners) {
       listenerFn(this.projects.slice());
     }
@@ -201,7 +200,6 @@ class ProjectItem
 
   @autobind
   dragStartHandler(event: DragEvent) {
-    //console.log(event);
     event.dataTransfer!.setData('text/plain', this.project.id);
     event.dataTransfer!.effectAllowed = 'move';
   }
@@ -251,7 +249,6 @@ class ProjectList
       prjId,
       this.type === 'active' ? ProjectStatus.Active : ProjectStatus.Finished
     );
-    console.log(event.dataTransfer!.getData('text/plain'));
   }
 
   @autobind
@@ -277,6 +274,10 @@ class ProjectList
     });
   }
   renderProjects() {
+    const listEl = document.getElementById(
+      `${this.type}-projects-list`
+    )! as HTMLUListElement;
+    listEl.innerHTML = '';
     for (const prjItem of this.assignedProjects) {
       new ProjectItem(this.element.querySelector('ul')!.id, prjItem);
     }
