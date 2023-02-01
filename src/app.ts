@@ -74,9 +74,7 @@ function autobind(_: any, _2: string, descriptor: PropertyDescriptor) {
 }
 
 class ProjectState {
-  //private listeners: any[] = [];
   private listeners: Listener[] = [];
-  //private projects: any[] = [];
   private projects: Project[] = [];
   private static instance: ProjectState;
 
@@ -89,9 +87,7 @@ class ProjectState {
     this.instance = new ProjectState();
     return this.instance;
   }
-  // addListener(listenerFn: Function) {
-  //   this.listeners.push(listenerFn);
-  // }
+
   addListener(listenerFn: Listener) {
     this.listeners.push(listenerFn);
   }
@@ -130,8 +126,18 @@ class ProjectList {
     this.element = importedNode.firstElementChild as HTMLElement;
     this.element.id = `${this.type}-projects`;
 
-    projectState.addListener((projects: any[]) => {
-      this.assignedProjects = projects;
+    // projectState.addListener((projects: any[]) => {
+    //   this.assignedProjects = projects;
+    //   this.renderProjects();
+    // });
+    projectState.addListener((projects: Project[]) => {
+      const relevantProjects = projects.filter((prj) => {
+        if (this.type === 'active') {
+          return prj.status === ProjectStatus.Active;
+        }
+        return prj.status === ProjectStatus.Finished;
+      });
+      this.assignedProjects = relevantProjects;
       this.renderProjects();
     });
 
@@ -142,6 +148,7 @@ class ProjectList {
     const listEl = document.getElementById(
       `${this.type}-projects-list`
     )! as HTMLUListElement;
+    listEl.innerHTML = '';
     for (const prjItem of this.assignedProjects) {
       const listItem = document.createElement('li');
       listItem.textContent = prjItem.title;
