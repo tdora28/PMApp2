@@ -27,6 +27,37 @@ class State {
         this.listeners.push(listenerFn);
     }
 }
+class ProjectState extends State {
+    constructor() {
+        super();
+        this.projects = [];
+    }
+    static getInstance() {
+        if (this.instance) {
+            return this.instance;
+        }
+        this.instance = new ProjectState();
+        return this.instance;
+    }
+    addProject(title, description, numOfPeople) {
+        const newProject = new Project(Math.random().toString(), title, description, numOfPeople, ProjectStatus.Active);
+        this.projects.push(newProject);
+        this.updateListeners();
+    }
+    moveProject(projectId, newStatus) {
+        const project = this.projects.find((prj) => prj.id === projectId);
+        if (project && project.status !== newStatus) {
+            project.status = newStatus;
+            this.updateListeners();
+        }
+    }
+    updateListeners() {
+        for (const listenerFn of this.listeners) {
+            listenerFn(this.projects.slice());
+        }
+    }
+}
+const projectState = ProjectState.getInstance();
 function validate(validatableInput) {
     let isValid = true;
     if (validatableInput.required) {
@@ -78,40 +109,6 @@ class Component {
         this.hostElement.insertAdjacentElement(insertAtBeginning ? 'afterbegin' : 'beforeend', this.element);
     }
 }
-class ProjectState extends State {
-    constructor() {
-        super();
-        this.projects = [];
-    }
-    static getInstance() {
-        if (this.instance) {
-            return this.instance;
-        }
-        this.instance = new ProjectState();
-        return this.instance;
-    }
-    addProject(title, description, numofpeople) {
-        const newProject = new Project(Math.random.toString(), title, description, numofpeople, ProjectStatus.Active);
-        this.projects.push(newProject);
-        this.updateListeners();
-        for (const listenerFn of this.listeners) {
-            listenerFn(this.projects.slice());
-        }
-    }
-    moveProject(projectId, newStatus) {
-        const project = this.projects.find((prj) => prj.id === projectId);
-        if (project && project.status !== newStatus) {
-            project.status = newStatus;
-            this.updateListeners();
-        }
-    }
-    updateListeners() {
-        for (const listenerFn of this.listeners) {
-            listenerFn(this.projects.slice());
-        }
-    }
-}
-const projectState = ProjectState.getInstance();
 class ProjectItem extends Component {
     get persons() {
         if (this.project.people === 1) {
@@ -156,11 +153,11 @@ class ProjectList extends Component {
         this.renderContent();
     }
     dragOverHandler(event) {
-        if (event.dataTransfer && event.dataTransfer.types[0] == 'text/plain') {
+        if (event.dataTransfer && event.dataTransfer.types[0] === 'text/plain') {
             event.preventDefault();
+            const listEl = this.element.querySelector('ul');
+            listEl.classList.add('droppable');
         }
-        const listEl = this.element.querySelector('ul');
-        listEl.classList.add('droppable');
     }
     dropHandler(event) {
         const prjId = event.dataTransfer.getData('text/plain');
@@ -168,7 +165,7 @@ class ProjectList extends Component {
     }
     dragLeaveHandler(_) {
         const listEl = this.element.querySelector('ul');
-        listEl.classList.add('droppable');
+        listEl.classList.remove('droppable');
     }
     configure() {
         this.element.addEventListener('dragover', this.dragOverHandler);
@@ -185,18 +182,18 @@ class ProjectList extends Component {
             this.renderProjects();
         });
     }
+    renderContent() {
+        const listId = `${this.type}-projects-list`;
+        this.element.querySelector('ul').id = listId;
+        this.element.querySelector('h2').textContent =
+            this.type.toUpperCase() + ' PROJECTS';
+    }
     renderProjects() {
         const listEl = document.getElementById(`${this.type}-projects-list`);
         listEl.innerHTML = '';
         for (const prjItem of this.assignedProjects) {
             new ProjectItem(this.element.querySelector('ul').id, prjItem);
         }
-    }
-    renderContent() {
-        const listId = `${this.type}-projects-list`;
-        this.element.querySelector('ul').id = listId;
-        this.element.querySelector('h2').textContent =
-            this.type.toUpperCase() + 'PROJECTS';
     }
 }
 __decorate([
@@ -216,6 +213,10 @@ class ProjectInput extends Component {
         this.peopleInputElement = this.element.querySelector('#people');
         this.configure();
     }
+    configure() {
+        this.element.addEventListener('submit', this.submitHandler);
+    }
+    renderContent() { }
     gatherUserInput() {
         const enteredTitle = this.titleInputElement.value;
         const enteredDescription = this.descriptionInputElement.value;
@@ -233,12 +234,13 @@ class ProjectInput extends Component {
             value: +enteredPeople,
             required: true,
             min: 1,
-            max: 10,
+            max: 5,
         };
         if (!validate(titleValidatable) ||
             !validate(descriptionValidatable) ||
             !validate(peopleValidatable)) {
-            alert('Invalid input, please try again');
+            alert('Invalid input, please try again!');
+            return;
         }
         else {
             return [enteredTitle, enteredDescription, +enteredPeople];
@@ -257,12 +259,7 @@ class ProjectInput extends Component {
             projectState.addProject(title, desc, people);
             this.clearInputs();
         }
-        console.log(this.titleInputElement.value);
     }
-    configure() {
-        this.element.addEventListener('submit', this.submitHandler);
-    }
-    renderContent() { }
 }
 __decorate([
     autobind
