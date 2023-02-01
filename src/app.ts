@@ -142,6 +142,7 @@ class ProjectState extends State<Project> {
       numofpeople,
       ProjectStatus.Active
     );
+    this.projects = [];
     this.projects.push(newProject);
     for (const listenerFn of this.listeners) {
       listenerFn(this.projects.slice());
@@ -161,7 +162,6 @@ class ProjectItem extends Component<HTMLUListElement, HTMLLIElement> {
       return `${this.project.people} persons`;
     }
   }
-
   constructor(hostId: string, project: Project) {
     super('single-project', hostId, false, project.id);
     this.project = project;

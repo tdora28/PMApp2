@@ -92,6 +92,7 @@ class ProjectState extends State {
     }
     addProject(title, description, numofpeople) {
         const newProject = new Project(Math.random.toString(), title, description, numofpeople, ProjectStatus.Active);
+        this.projects = [];
         this.projects.push(newProject);
         for (const listenerFn of this.listeners) {
             listenerFn(this.projects.slice());
