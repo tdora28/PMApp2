@@ -1,3 +1,22 @@
+// Project Type
+enum ProjectStatus {
+  Active,
+  Finished,
+}
+
+class Project {
+  constructor(
+    public id: string,
+    public title: string,
+    public description: string,
+    public people: number,
+    public status: ProjectStatus
+  ) {}
+}
+
+// Project State management
+type Listener = (items: Project[]) => void;
+
 interface Validatable {
   value: string | number;
   required?: boolean;
@@ -55,8 +74,10 @@ function autobind(_: any, _2: string, descriptor: PropertyDescriptor) {
 }
 
 class ProjectState {
-  private listeners: any[] = [];
-  private projects: any[] = [];
+  //private listeners: any[] = [];
+  private listeners: Listener[] = [];
+  //private projects: any[] = [];
+  private projects: Project[] = [];
   private static instance: ProjectState;
 
   private constructor() {}
@@ -68,16 +89,20 @@ class ProjectState {
     this.instance = new ProjectState();
     return this.instance;
   }
-  addListener(listenerFn: Function) {
+  // addListener(listenerFn: Function) {
+  //   this.listeners.push(listenerFn);
+  // }
+  addListener(listenerFn: Listener) {
     this.listeners.push(listenerFn);
   }
   addProject(title: string, description: string, numofpeople: number) {
-    const newProject = {
-      id: Math.random.toString(),
-      title: title,
-      description: description,
-      people: numofpeople,
-    };
+    const newProject = new Project(
+      Math.random.toString(),
+      title,
+      description,
+      numofpeople,
+      ProjectStatus.Active
+    );
     this.projects.push(newProject);
     for (const listenerFn of this.listeners) {
       listenerFn(this.projects.slice());
