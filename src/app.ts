@@ -15,7 +15,15 @@ class Project {
 }
 
 // Project State management
-type Listener = (items: Project[]) => void;
+type Listener<T> = (items: T[]) => void;
+
+class State<T> {
+  protected listeners: Listener<T>[] = [];
+
+  addListener(listenerFn: Listener<T>) {
+    this.listeners.push(listenerFn);
+  }
+}
 
 interface Validatable {
   value: string | number;
@@ -109,12 +117,14 @@ abstract class Component<T extends HTMLElement, U extends HTMLElement> {
   abstract renderContent(): void;
 }
 
-class ProjectState {
-  private listeners: Listener[] = [];
+class ProjectState extends State<Project> {
+  //private listeners: Listener[] = [];
   private projects: Project[] = [];
   private static instance: ProjectState;
 
-  private constructor() {}
+  private constructor() {
+    super();
+  }
 
   static getInstance() {
     if (this.instance) {
@@ -124,9 +134,6 @@ class ProjectState {
     return this.instance;
   }
 
-  addListener(listenerFn: Listener) {
-    this.listeners.push(listenerFn);
-  }
   addProject(title: string, description: string, numofpeople: number) {
     const newProject = new Project(
       Math.random.toString(),
@@ -253,7 +260,6 @@ class ProjectInput extends Component<HTMLDivElement, HTMLFormElement> {
     const userInput = this.gatherUserInput();
     if (Array.isArray(userInput)) {
       const [title, desc, people] = userInput;
-      //console.log(title, desc, people);
       projectState.addProject(title, desc, people);
       this.clearInputs();
     }

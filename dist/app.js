@@ -19,6 +19,14 @@ class Project {
         this.status = status;
     }
 }
+class State {
+    constructor() {
+        this.listeners = [];
+    }
+    addListener(listenerFn) {
+        this.listeners.push(listenerFn);
+    }
+}
 function validate(validatableInput) {
     let isValid = true;
     if (validatableInput.required) {
@@ -70,9 +78,9 @@ class Component {
         this.hostElement.insertAdjacentElement(insertAtBeginning ? 'afterbegin' : 'afterend', this.element);
     }
 }
-class ProjectState {
+class ProjectState extends State {
     constructor() {
-        this.listeners = [];
+        super();
         this.projects = [];
     }
     static getInstance() {
@@ -81,9 +89,6 @@ class ProjectState {
         }
         this.instance = new ProjectState();
         return this.instance;
-    }
-    addListener(listenerFn) {
-        this.listeners.push(listenerFn);
     }
     addProject(title, description, numofpeople) {
         const newProject = new Project(Math.random.toString(), title, description, numofpeople, ProjectStatus.Active);
