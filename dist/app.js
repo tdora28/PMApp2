@@ -41,17 +41,52 @@ function autobind(_, _2, descriptor) {
     };
     return adjDescriptor;
 }
+class ProjectState {
+    constructor() {
+        this.listeners = [];
+        this.projects = [];
+    }
+    static getInstance() {
+        if (this.instance) {
+            return this.instance;
+        }
+        this.instance = new ProjectState();
+        return this.instance;
+    }
+    addListener(listenerFn) {
+        this.listeners.push(listenerFn);
+    }
+    addProject(title, description, numofpeople) {
+        const newProject = {
+            id: Math.random.toString(),
+            title: title,
+            description: description,
+            people: numofpeople,
+        };
+        this.projects.push(newProject);
+        for (const listenerFn of this.listeners) {
+            listenerFn(this.projects.slice());
+        }
+    }
+}
+const projectState = ProjectState.getInstance();
 class ProjectList {
     constructor(type) {
         this.type = type;
         this.templateElement = document.getElementById('project-list');
         this.hostElement = document.getElementById('app');
+        this.assignedProjects = [];
         const importedNode = document.importNode(this.templateElement.content, true);
         this.element = importedNode.firstElementChild;
         this.element.id = `${this.type}-projects`;
+        projectState.addListener((projects) => {
+            this.assignedProjects = projects;
+            this.renderProjects();
+        });
         this.attach();
         this.renderContent();
     }
+    renderProjects() { }
     renderContent() {
         const listId = `${this.type}-projects-list`;
         this.element.querySelector('ul').id = listId;
