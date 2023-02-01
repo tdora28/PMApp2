@@ -109,7 +109,7 @@ abstract class Component<T extends HTMLElement, U extends HTMLElement> {
   }
   private attach(insertAtBeginning: boolean) {
     this.hostElement.insertAdjacentElement(
-      insertAtBeginning ? 'afterbegin' : 'afterend',
+      insertAtBeginning ? 'afterbegin' : 'beforeend',
       this.element
     );
   }

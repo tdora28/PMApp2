@@ -75,7 +75,7 @@ class Component {
         this.attach(insertAtStart);
     }
     attach(insertAtBeginning) {
-        this.hostElement.insertAdjacentElement(insertAtBeginning ? 'afterbegin' : 'afterend', this.element);
+        this.hostElement.insertAdjacentElement(insertAtBeginning ? 'afterbegin' : 'beforeend', this.element);
     }
 }
 class ProjectState extends State {
