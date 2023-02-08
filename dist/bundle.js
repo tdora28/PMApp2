@@ -22,6 +22,9 @@ var App;
         }
     }
     App.Project = Project;
+})(App || (App = {}));
+var App;
+(function (App) {
     class State {
         constructor() {
             this.listeners = [];
@@ -44,7 +47,7 @@ var App;
             return this.instance;
         }
         addProject(title, description, numOfPeople) {
-            const newProject = new Project(Math.random().toString(), title, description, numOfPeople, ProjectStatus.Active);
+            const newProject = new App.Project(Math.random().toString(), title, description, numOfPeople, App.ProjectStatus.Active);
             this.projects.push(newProject);
             this.updateListeners();
         }

@@ -1,5 +1,6 @@
 /// <reference path="drag-and-drop.ts" />
 /// <reference path="project-model.ts" />
+/// <reference path="project-state.ts" />
 
 namespace App {
   // Validation
