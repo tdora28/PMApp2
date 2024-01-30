@@ -27,14 +27,8 @@ export class ProjectState extends State<Project> {
     return this.instance;
   }
 
-  addProject(title: string, description: string, numOfPeople: number) {
-    const newProject = new Project(
-      Math.random().toString(),
-      title,
-      description,
-      numOfPeople,
-      ProjectStatus.Active
-    );
+  addProject(title: string, description: string, numOfPeople: number, comment: string) {
+    const newProject = new Project(Math.random().toString(), title, description, numOfPeople, comment, ProjectStatus.Active);
     this.projects.push(newProject);
     this.updateListeners();
   }
